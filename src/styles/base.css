@@ -1,0 +1,23 @@
+body {
+    margin: 0;
+    padding: 0;
+    line-height: 1.4;
+    font-family: sans-serif;
+}
+
+.hoge{
+  background-color: red;
+}
+
+.fuga{
+  color: red;
+}
+
+.blue-font{
+  color: blue;
+}
+
+.zero-margin{
+  padding: 0px;
+  margin: 0px;
+}
