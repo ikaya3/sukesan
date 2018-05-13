@@ -146,7 +146,7 @@ app.get('/api/mongo_test', function(req, res, next){
 
 MongoClient.connect(urljoin(env.mongodb_uri, env.db_name), function(err,client){
   db = client.db(env.db_name);
-  var server = app.listen(3000, function(){
+  var server = app.listen(env.webserver_port, function(){
     console.log(new Date());
   });
 });
