@@ -1,4 +1,15 @@
+const webpack = require("webpack")
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
+
+var fs = require('fs');
+var env = {};
+try{
+  env = JSON.parse(fs.readFileSync('./env.json', "utf-8"));
+}catch(e){
+  console.log("fail to read \'env.json\', then use default file \'env.json.sample\'.");
+  env = JSON.parse(fs.readFileSync('./env.json.sample', "utf-8"));
+}
+
 
 module.exports = {
   entry: {
@@ -41,6 +52,9 @@ module.exports = {
   },
   plugins: [
     new ExtractTextPlugin('bundle.css'),
+    new webpack.DefinePlugin({
+      __AJAX_SERVER_URI: JSON.stringify("http://" + env.webserver_addr + ":" + env.webserver_port),
+    }),
   ],
   devServer: {
     contentBase: `${__dirname}/public`,
