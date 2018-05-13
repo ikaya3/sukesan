@@ -1,9 +1,24 @@
 var express = require('express');
 var app = express();
 var mongodb = require('mongodb');
+
+var fs = require('fs');
+var urljoin = require('url-join');
+
 const MongoClient = mongodb.MongoClient;
 
-const _mongodb_uri = 'mongodb://localhost:27017/sukesan';
+
+var env = {};
+try{
+  env = JSON.parse(fs.readFileSync('./env.json', "utf-8"));
+}catch(e){
+  console.log("fail to read \'env.json\', then use default file \'env.json.sample\'.");
+  env = JSON.parse(fs.readFileSync('./env.json.sample', "utf-8"));
+}
+
+console.log("the environment is below:");
+console.log(env);
+
 var db;
 
 app.use('/', express.static('public'));
@@ -129,8 +144,8 @@ app.get('/api/mongo_test', function(req, res, next){
   });
 });
 
-MongoClient.connect(_mongodb_uri, function(err,client){
-  db = client.db('sukesan');
+MongoClient.connect(urljoin(env.mongodb_uri, env.db_name), function(err,client){
+  db = client.db(env.db_name);
   var server = app.listen(3000, function(){
     console.log(new Date());
   });
