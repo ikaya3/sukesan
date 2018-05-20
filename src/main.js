@@ -103,6 +103,7 @@ var ExpandRow = createReactClass({
     return (
       <div>
         <BootstrapTable data={this.state.data}
+          version="4" hover striped condensed
           options = { options }
           expandableRow  = { () => true }
           expandComponent= { this.expandComponent }>
