@@ -35,6 +35,7 @@ var ExpandRow = createReactClass({
     return {
       data: [],
       range: this.getInitialRange(),
+      pj_detail: {},
     };
   },
 
@@ -66,8 +67,18 @@ var ExpandRow = createReactClass({
   },
 
   onExpand: function(key, isExpand) {
-    console.log(key);
-    console.log(isExpand);
+    if(isExpand) {
+      console.log(key);
+      request
+        .get(__AJAX_SERVER_URI + '/api/mongo_test2')
+        .query({borders_of_date: this.getBordersOfDate().map((v) => v.toJSON()) })
+        .end(function(err,res){
+          const pj_detail_copy = this.state.pj_detail;
+          pj_detail_copy[key] = res.body;
+          console.log(pj_detail_copy);
+          this.setState({pj_detail: pj_detail_copy});
+        }.bind(this));
+    }
   },
 
   render: function() {
