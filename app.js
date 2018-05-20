@@ -61,11 +61,45 @@ var get_date_index = function(target, borders_of_date){
   return -1;
 };
 
+var reduce_hour = function(key, values){
+  var result = { hour: 0 };
+  values.forEach(function(value){ result.hour += value.hour; });
+  return result;
+};
+
+var reduce_results = function(key, get_name, results, size_of_range){
+  return results.reduce(function (reduced_results, result) {
+    var element = reduced_results.find(function (p) {
+      return p._id === result._id[key];
+    });
+    if(!element){
+      reduced_results.push({
+        _id: result._id[key],
+        name: get_name(result),
+        out_of_range: 0,
+        total: 0,
+      });
+      element = reduced_results[reduced_results.length-1];
+      for(var i=0; i<size_of_range; i++)
+      {
+        element["range" + i] = 0;
+      }
+    }
+    if(result._id.date_index >= 0){
+      element["range" + result._id.date_index] += result.value.hour;
+    }else{
+      element.out_of_range += result.value.hour;
+    }
+    element.total += result.value.hour;
+
+    return reduced_results;
+  }, []);
+};
+
+
 app.get('/api/mongo_test2', function(req, res, next){
   var borders_of_date = req.query.borders_of_date || [(new Date()).toJSON()];
   borders_of_date = borders_of_date.map((v) => new Date(v));
-
-  var size = borders_of_date.length - 1;
 
   db.collection('detail', function(err, collection){
     collection.aggregate(
@@ -78,49 +112,20 @@ app.get('/api/mongo_test2', function(req, res, next){
       active_pjs = active_pjs.map(function(pj){ return pj._id; });
       collection.mapReduce(
         function() { emit( { pj_id: this.pj_id, date_index: get_date_index(this.date, borders_of_date) }, { hour: this.hour } ); },
-        function(key, values){
-          var result = { hour: 0 };
-          values.forEach(function(value){ result.hour += value.hour; });
-          return result;
-        },
+        reduce_hour,
         {
-          scope: { get_date_index: get_date_index,
-                   borders_of_date: borders_of_date },
+          scope: { get_date_index : get_date_index,
+                   borders_of_date: borders_of_date,
+                   reduce_hour    : reduce_hour},
           query: { pj_id: { "$in": active_pjs } },
           out  : { inline: 1 },
         },
         function(err, results){
-          var reduced_results = results.reduce(function (reduced_results, result) {
-            var element = reduced_results.find(function (p) {
-              return p._id === result._id.pj_id;
-            });
-            if(!element){
-              reduced_results.push({
-                _id: result._id.pj_id,
-                pj_name: pj[result._id.pj_id] || "NO NAME",
-                out_of_range: 0,
-                total: 0,
-              });
-              element = reduced_results[reduced_results.length-1];
-	      for(var i=0; i<size; i++)
-	      {
-		element["range" + i] = 0;
-	      }
-            }
-            if(result._id.date_index >= 0){
-              element["range" + result._id.date_index] += result.value.hour;
-            }else{
-              element.out_of_range += result.value.hour;
-            }
-            element.total += result.value.hour;
-
-            return reduced_results;
-          }, []);
-
-//          console.log(results);
-//          console.log(reduced_results);
-
-          res.json(reduced_results);
+          res.json(reduce_results(
+            "pj_id",
+            (result) => { return pj[result._id["pj_id"]] || "NO NAME"; },
+            results,
+            borders_of_date.length - 1));
         }
       );
     });
