@@ -145,8 +145,7 @@ var ExpandRow = createReactClass({
 ReactDOM.render(
   <div>
     <h1>sukesan</h1>
-
-    <ExpandRow /*data={products}*/ />
+    <ExpandRow/>
 
     <div className="page-header">hogehoge</div>
     <p className='fuga'>hogehoge</p>
