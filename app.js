@@ -98,8 +98,7 @@ var reduce_results = function(key, get_name, results, size_of_range){
 
 
 app.get('/api/mongo_test2', function(req, res, next){
-  var borders_of_date = req.query.borders_of_date || [(new Date()).toJSON()];
-  borders_of_date = borders_of_date.map((v) => new Date(v));
+  const borders_of_date = (req.query.borders_of_date || [(new Date()).toJSON()]).map((v) => new Date(v));
 
   db.collection('detail', function(err, collection){
     collection.aggregate(
