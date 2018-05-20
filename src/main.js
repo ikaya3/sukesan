@@ -87,7 +87,8 @@ var ExpandRow = createReactClass({
           options = { options }
           expandableRow  = { () => true }
           expandComponent= { this.expandComponent }>
-	  <TableHeaderColumn isKey dataField='_id' className='hoge' width='30%'>Project ID</TableHeaderColumn>
+	  <TableHeaderColumn isKey dataField='_id' className='hoge' width='15%'>Project ID</TableHeaderColumn>
+	  <TableHeaderColumn dataField='pj_name' width='20%'>Name</TableHeaderColumn>
 	  {range.map( (v, i) =>
 		      <TableHeaderColumn key={v} headerAlign='center' dataAlign='right' dataField={'range'+i} dataFormat={ (cell) => cell.toFixed(1) } >{v}</TableHeaderColumn>
 		    )}
