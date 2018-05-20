@@ -65,12 +65,6 @@ app.get('/api/mongo_test2', function(req, res, next){
   var borders_of_date = req.query.borders_of_date || [(new Date()).toJSON()];
   borders_of_date = borders_of_date.map((v) => new Date(v));
 
-  var date_range = {
-    from: new Date(new Date("2018/03/01").setHours(0,0,0,0)),
-    to  : new Date(new Date("2018/05/06").setHours(0,0,0,0)),
-  };
-//  var divided_by = 7;
-//  var size = get_date_index(date_range.to, date_range, divided_by)+1;
   var size = borders_of_date.length - 1;
 
   db.collection('detail', function(err, collection){
