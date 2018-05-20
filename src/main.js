@@ -47,21 +47,30 @@ var ExpandRow = createReactClass({
       .get(__AJAX_SERVER_URI + '/api/mongo_test2')
       .query({borders_of_date: this.getBordersOfDate().map((v) => v.toJSON()) })
       .end(function(err,res){
-	console.log("response");
-	console.log(res.body);
-	this.setState({data: res.body});
+        const pj_detail_copy = this.state.pj_detail;
+        console.log("response");
+        console.log(res.body);
+        res.body.forEach(function(document){ pj_detail_copy[document._id] = []; });
+        this.setState({data: res.body, pj_detail: pj_detail_copy});
       }.bind(this));
   },
 
   expandComponent: function(row) {
+    const range = this.getBordersOfDate().map(
+      (v) => (('0' + (v.getMonth() + 1)).slice(-2)) + '/' + (('0' + (v.getDate())).slice(-2)))
+    range.pop();
+
     return (
       <div className="zero-margin">
         <p>{ row._id }</p>
-        <BootstrapTable data={products}>
-	<TableHeaderColumn isKey dataField='id' className='hoge'>Product ID</TableHeaderColumn>
-	<TableHeaderColumn dataField='name' width='15%'>Product Name</TableHeaderColumn>
-	<TableHeaderColumn dataField='price' dataSort columnClassName= { columnClassNameFormat } >Product Price</TableHeaderColumn>
-	</BootstrapTable>
+        <BootstrapTable data={this.state.pj_detail[row._id]}>
+          <TableHeaderColumn isKey dataField='_id' className='hoge' width='15%'>Person ID</TableHeaderColumn>
+          <TableHeaderColumn dataField='name' width='20%'>Name</TableHeaderColumn>
+          {range.map( (v, i) =>
+                      <TableHeaderColumn key={v} headerAlign='center' dataAlign='right' dataField={'range'+i} dataFormat={ (cell) => cell.toFixed(1) } >{v}</TableHeaderColumn>
+                    )}
+          <TableHeaderColumn dataField='total' dataSort columnClassName= { columnClassNameFormat } headerAlign='center' dataAlign='right' dataFormat={ (cell) => cell.toFixed(1) } >Total</TableHeaderColumn>
+        </BootstrapTable>
       </div>
     );
   },
@@ -70,8 +79,8 @@ var ExpandRow = createReactClass({
     if(isExpand) {
       console.log(key);
       request
-        .get(__AJAX_SERVER_URI + '/api/mongo_test2')
-        .query({borders_of_date: this.getBordersOfDate().map((v) => v.toJSON()) })
+        .get(__AJAX_SERVER_URI + '/api/mongo_test3')
+        .query({pj_id: key, borders_of_date: this.getBordersOfDate().map((v) => v.toJSON()) })
         .end(function(err,res){
           const pj_detail_copy = this.state.pj_detail;
           pj_detail_copy[key] = res.body;

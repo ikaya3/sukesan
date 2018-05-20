@@ -131,6 +131,32 @@ app.get('/api/mongo_test2', function(req, res, next){
   });
 });
 
+app.get('/api/mongo_test3', function(req, res, next){
+  const target_pj_id = req.query.pj_id;
+  const borders_of_date = (req.query.borders_of_date || [(new Date()).toJSON()]).map((v) => new Date(v));
+
+  db.collection('detail', function(err, collection){
+    collection.mapReduce(
+      function() { emit( { person_id: this.person_id, person_name: this.person_name, date_index: get_date_index(this.date, borders_of_date) }, { hour: this.hour } ); },
+      reduce_hour,
+      {
+        scope: { get_date_index : get_date_index,
+                 borders_of_date: borders_of_date,
+                 reduce_hour    : reduce_hour},
+        query: { pj_id: target_pj_id },
+        out  : { inline: 1 },
+      },
+      function(err, results){
+        res.json(reduce_results(
+          "person_id",
+          (result) => { return result._id["person_name"]; },
+          results,
+          borders_of_date.length - 1));
+      }
+    );
+  });
+});
+
 app.get('/api/mongo_test', function(req, res, next){
   db.collection('detail', function(err, collection){
     collection.aggregate(
