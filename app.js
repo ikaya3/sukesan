@@ -7,6 +7,7 @@ var urljoin = require('url-join');
 
 const MongoClient = mongodb.MongoClient;
 
+var pj = {};
 
 var env = {};
 try{
@@ -146,6 +147,13 @@ app.get('/api/mongo_test', function(req, res, next){
 
 MongoClient.connect(urljoin(env.mongodb_uri, env.db_name), function(err,client){
   db = client.db(env.db_name);
+
+  // TODO : pj の管理はもう少し何とかしたい。
+  db.collection('pj', function(err, collection){
+    collection.find().forEach((document)=>{
+      pj[document._id] = document.pj_name;
+    });
+  });
   var server = app.listen(env.webserver_port, function(){
     console.log(new Date());
   });
