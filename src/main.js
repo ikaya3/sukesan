@@ -55,8 +55,7 @@ var ExpandRow = createReactClass({
   expandComponent: function(row) {
     return (
       <div className="zero-margin">
-        <p>Im expand panel for row: { row.id }</p>
-        <p>This is a demo for expanding table with keyboard navigation</p>
+        <p>{ row._id }</p>
         <BootstrapTable data={products}>
 	<TableHeaderColumn isKey dataField='id' className='hoge'>Product ID</TableHeaderColumn>
 	<TableHeaderColumn dataField='name' width='15%'>Product Name</TableHeaderColumn>
