@@ -147,6 +147,7 @@ ReactDOM.render(
     <h1>sukesan</h1>
     <ExpandRow/>
 
+  {/*
     <div className="page-header">hogehoge</div>
     <p className='fuga'>hogehoge</p>
 
@@ -155,6 +156,8 @@ ReactDOM.render(
     <TableHeaderColumn dataField='name' width='15%'>Product Name</TableHeaderColumn>
     <TableHeaderColumn dataField='price' dataSort columnClassName= { columnClassNameFormat } >Product Price</TableHeaderColumn>
     </BootstrapTable>,
+   */}
+
   </div>,
   document.getElementById('app')
 );
