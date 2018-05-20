@@ -45,6 +45,7 @@ var ExpandRow = createReactClass({
     request
       .get(__AJAX_SERVER_URI + '/api/mongo_test2')
       .query({hoge: {fuga: true}, borders_of_date: this.getBordersOfDate().map((v) => v.toJSON()) })
+      .query({borders_of_date: this.getBordersOfDate().map((v) => v.toJSON()) })
       .end(function(err,res){
 	console.log("response");
 	console.log(res.body);
