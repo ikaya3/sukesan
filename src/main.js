@@ -62,7 +62,7 @@ var ExpandRow = createReactClass({
 
     return (
       <div className="zero-margin">
-        <p>{ row._id }</p>
+        <p>{ row.name + " / " + row._id }</p>
         <BootstrapTable data={this.state.pj_detail[row._id]}>
           <TableHeaderColumn isKey dataField='_id' className='hoge' width='15%'>Person ID</TableHeaderColumn>
           <TableHeaderColumn dataField='name' width='20%'>Name</TableHeaderColumn>
