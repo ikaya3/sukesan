@@ -103,7 +103,7 @@ app.get('/api/mongo_test2', function(req, res, next){
             if(!element){
               reduced_results.push({
                 _id: result._id.pj_id,
-                pj_name: pj[result._id.pj_id],
+                pj_name: pj[result._id.pj_id] || "NO NAME",
                 out_of_range: 0,
                 total: 0,
               });
