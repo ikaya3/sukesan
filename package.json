@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "build": "webpack --progress -p",
+    "dev": "parallelshell \"webpack-dev-server\" \"node-dev app.js\"",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
