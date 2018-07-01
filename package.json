@@ -6,6 +6,7 @@
   "scripts": {
     "build": "webpack --progress -p",
     "dev": "parallelshell \"webpack-dev-server\" \"node-dev app.js\"",
+    "import-testdata": "node test_scripts/create_detail.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
