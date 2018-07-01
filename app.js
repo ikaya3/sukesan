@@ -6,7 +6,7 @@ var urljoin = require('url-join');
 
 const MongoClient = mongodb.MongoClient;
 
-const env = require('./lib/env').env;
+const env = require('./lib/env');
 
 var pj = {};
 var db;

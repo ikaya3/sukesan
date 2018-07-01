@@ -1,7 +1,7 @@
 const webpack = require("webpack")
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
 
-const env = require('./lib/env').env;
+const env = require('./lib/env');
 
 module.exports = {
   entry: {
