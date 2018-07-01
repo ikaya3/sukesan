@@ -1,15 +1,7 @@
 const webpack = require("webpack")
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
 
-var fs = require('fs');
-var env = {};
-try{
-  env = JSON.parse(fs.readFileSync('./env.json', "utf-8"));
-}catch(e){
-  console.log("fail to read \'env.json\', then use default file \'env.json.sample\'.");
-  env = JSON.parse(fs.readFileSync('./env.json.sample', "utf-8"));
-}
-
+const env = require('./lib/env').env;
 
 module.exports = {
   entry: {
