@@ -46,11 +46,11 @@ var ExpandRow = createReactClass({
       .get(__AJAX_SERVER_URI + '/api/mongo_test2')
       .query({borders_of_date: this.getBordersOfDate(range).map((v) => v.toJSON()) })
       .end(function(err,res){
-        const pj_detail_copy = this.state.pj_detail;
+        const pj_detail = {};
         console.log("response");
         console.log(res.body);
-        res.body.forEach(function(document){ pj_detail_copy[document._id] = []; });
-        this.setState({data: res.body, pj_detail: pj_detail_copy, range: range});
+        res.body.forEach(function(document){ pj_detail[document._id] = []; });
+        this.setState({data: res.body, pj_detail: pj_detail, range: range});
       }.bind(this));
   },
 
