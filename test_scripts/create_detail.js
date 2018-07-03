@@ -18,6 +18,7 @@ const documents = [
   { "pj_id": "P20180102", "pj_name": "プロプロテスト２", "person_id": "01234", "person_name": "some boy", "hour":  7, "date": new Date("2018-06-27") },
   { "pj_id": "P20180101", "pj_name": "ぷろじぇテスト１", "person_id": "01234", "person_name": "some boy", "hour":  8, "date": new Date("2018-07-01") },
   { "pj_id": "P20180101", "pj_name": "ぷろじぇテスト１", "person_id": "Z9999", "person_name": "X-men"   , "hour":  5, "date": new Date("2018-07-02") },
+  { "pj_id": "P20180007", "pj_name": "パイロット的な"  , "person_id": "01234", "person_name": "some boy", "hour": 12, "date": new Date("2018-04-01") },
 ];
 
 MongoClient.connect(urljoin(env.mongodb_uri, env.db_name), (err,client) => {
