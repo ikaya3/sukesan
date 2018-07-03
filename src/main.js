@@ -23,20 +23,6 @@ function columnClassNameFormat(fieldValue) {
   return (fieldValue >= 200) ? 'hoge' : 'fuga';
 }
 
-var products = [{
-      id: 1,
-      name: "Product1",
-      price: 120
-  }, {
-      id: 2,
-      name: "Product2",
-      price: 80
-  }, {
-      id: 3,
-      name: "Product3",
-      price: 800
-  }];
-
 var ExpandRow = createReactClass({
   getInitialState: function(){
     console.log("getinitialstate");

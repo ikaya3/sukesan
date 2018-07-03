@@ -19,27 +19,6 @@ app.use(function(req, res, next) {
   next();
 });
 
-app.get('/api/get_pj', function(req, res, next){
-  var records = [
-    {
-      id: 1,
-      name: "Product1",
-      price: 120
-    },
-    {
-      id: 2,
-      name: "Product2",
-      price: 80
-    },
-    {
-      id: 3,
-      name: "Product3",
-      price: 800
-    }
-  ];
-  res.json(records);
-});
-
 var get_date_index = function(target, borders_of_date){
   for(var i=0; i<borders_of_date.length; i++) {
     if(target < borders_of_date[i]) {
