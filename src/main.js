@@ -1,12 +1,17 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
-import { ButtonToolbar } from 'react-bootstrap';
-import { ToggleButton, ToggleButtonGroup } from 'react-bootstrap';
+const React    = require('react');
+const ReactDom = require('react-dom');
 
-import {BootstrapTable, TableHeaderColumn} from 'react-bootstrap-table';
+const ReactBootstrap    = require('react-bootstrap');
+const ButtonToolbar     = ReactBootstrap.ButtonToolbar;
+const ToggleButton      = ReactBootstrap.ToggleButton;
+const ToggleButtonGroup = ReactBootstrap.ToggleButtonGroup;
 
-var request = require('superagent');
-var createReactClass = require('create-react-class');
+const ReactBootstrapTable = require('react-bootstrap-table');
+const BootstrapTable      = ReactBootstrapTable.BootstrapTable;
+const TableHeaderColumn   = ReactBootstrapTable.TableHeaderColumn;
+
+const request = require('superagent');
+const createReactClass = require('create-react-class');
 
 const WIDTH_TYPE = {
   DAY  : 0,
@@ -184,7 +189,7 @@ var ExpandRow = createReactClass({
 
 });
 
-ReactDOM.render(
+ReactDom.render(
   <div>
     <h1>sukesan</h1>
 
