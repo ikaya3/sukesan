@@ -64,29 +64,32 @@ var reduce_results = function(key, get_name, results, size_of_range){
   }, []);
 };
 
-var get_pjs = function(pjs, borders_of_date, collection_detail){
+var get_condition = function(pjs, persons, field, borders_of_date, collection_detail){
   return new Promise(function(resolve, reject){
     if(pjs){
-      resolve(pjs);
+      resolve({ pj_id: { "$in": pjs } });
     }
 
     collection_detail.aggregate(
       [
         { "$match": { "$and": [ { date: { "$gte": borders_of_date[0] } }, { date: { "$lt": borders_of_date[borders_of_date.length-1] } } ] } },
-        { "$group": { _id: "$pj_id"  } },
+        { "$group": { _id: "$" + field  } },
       ],
-    ).toArray(function(err, active_pjs){
+    ).toArray(function(err, active_records){
       if(err){
         reject(err);
       }
-      resolve(active_pjs.map(function(pj){ return pj._id; }));
+      resolve({
+        [field]:{
+          "$in": active_records.map(function(record){ return record._id; })}});
     });
   });
 };
 
 app.get('/api/mongo_test2', function(req, res, next){
   const key = req.query.key;
-  const pjs = (typeof(req.query.pjs) === 'string') ? [ req.query.pjs ] : req.query.pjs;
+  const pjs     = (typeof(req.query.pjs    ) === 'string') ? [ req.query.pjs     ] : req.query.pjs;
+  const persons = (typeof(req.query.persons) === 'string') ? [ req.query.persons ] : req.query.persons;
   const borders_of_date = (req.query.borders_of_date || [(new Date()).toJSON()]).map((v) => new Date(v));
   console.log(pjs);
 
@@ -103,7 +106,7 @@ app.get('/api/mongo_test2', function(req, res, next){
   };
 
   db.collection('detail', function(err, collection){
-    get_pjs(pjs, borders_of_date, collection).then(function(active_pjs){
+    get_condition(pjs, persons, field_name.id, borders_of_date, collection).then(function(condition){
       collection.mapReduce(
         map_key, reduce_hour,
         {
@@ -111,7 +114,7 @@ app.get('/api/mongo_test2', function(req, res, next){
                    borders_of_date: borders_of_date,
                    map_key        : map_key,
                    reduce_hour    : reduce_hour},
-          query: { pj_id: { "$in": active_pjs } },
+          query: condition,
           out  : { inline: 1 },
         },
         function(err, results){
