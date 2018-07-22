@@ -70,6 +70,10 @@ var get_condition = function(pjs, persons, field, borders_of_date, collection_de
       resolve({ pj_id: { "$in": pjs } });
     }
 
+    if(persons){
+      resolve({ person_id: { "$in": persons } });
+    }
+
     collection_detail.aggregate(
       [
         { "$match": { "$and": [ { date: { "$gte": borders_of_date[0] } }, { date: { "$lt": borders_of_date[borders_of_date.length-1] } } ] } },
@@ -91,7 +95,7 @@ app.get('/api/mongo_test2', function(req, res, next){
   const pjs     = (typeof(req.query.pjs    ) === 'string') ? [ req.query.pjs     ] : req.query.pjs;
   const persons = (typeof(req.query.persons) === 'string') ? [ req.query.persons ] : req.query.persons;
   const borders_of_date = (req.query.borders_of_date || [(new Date()).toJSON()]).map((v) => new Date(v));
-  console.log(pjs);
+  console.log("filter: pjs: " + pjs + ", persons: " + persons);
 
   const map_key = (key == "pj")
     ? function() { emit( { pj_id: this.pj_id, date_index: get_date_index(this.date, borders_of_date) }, { hour: this.hour } ); }

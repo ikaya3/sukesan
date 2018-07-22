@@ -13,6 +13,11 @@ const TableHeaderColumn   = ReactBootstrapTable.TableHeaderColumn;
 const request = require('superagent');
 const createReactClass = require('create-react-class');
 
+const KEY_TYPE = {
+  PJ    : 0,
+  PERSON: 1,
+};
+
 const WIDTH_TYPE = {
   DAY  : 0,
   WEEK : 1,
@@ -33,6 +38,7 @@ var ExpandRow = createReactClass({
     console.log("getinitialstate");
     return {
       data: [],
+      prime_key: KEY_TYPE.PJ,
       range: this.getInitialRange(),
       pj_detail: {},
     };
@@ -43,14 +49,18 @@ var ExpandRow = createReactClass({
     this.requestSummary();
   },
 
-  requestSummary: function(range) {
-    range = range || this.state.range;
+  requestSummary: function(param = {}) {
+    console.log(param);
+    const range     = param.range     || this.state.range;
+    const prime_key = param.prime_key || this.getPrimeKey(this.state.prime_key);
+    console.log(prime_key);
     console.log(range);
+
 
     request
       .get(__AJAX_SERVER_URI + '/api/mongo_test2')
       .query({
-        key: "pj",
+        key: prime_key,
         borders_of_date: this.getBordersOfDate(range).map((v) => v.toJSON()),
       })
       .end(function(err,res){
@@ -86,11 +96,13 @@ var ExpandRow = createReactClass({
     console.log(this.state.expanded);
     if(isExpand) {
       console.log(key);
+      console.log(this.state.prime_key);
       request
         .get(__AJAX_SERVER_URI + '/api/mongo_test2')
         .query({
-          key: "person",
-          pjs: key,
+          key: this.getSecondKey(),
+          pjs:     ((this.state.prime_key == KEY_TYPE.PJ) ? key : undefined),
+          persons: ((this.state.prime_key != KEY_TYPE.PJ) ? key : undefined),   // TODO : 「== KEY_TYPE.PERSONS」だとうまくいかない？
           borders_of_date: this.getBordersOfDate().map((v) => v.toJSON()),
         })
         .end(function(err,res){
@@ -104,7 +116,13 @@ var ExpandRow = createReactClass({
 
   onChangeRange: function(value) {
     console.log(value);
-    this.requestSummary(this.getRange(new Date(), value, this.state.range.count));
+    this.requestSummary({range: this.getRange(new Date(), value, this.state.range.count)});
+  },
+
+  onChangePrimeKey: function(value) {
+    console.log(value);
+    this.setState({prime_key: value});
+    this.requestSummary({prime_key: this.getPrimeKey(value)});
   },
 
   render: function() {
@@ -119,6 +137,12 @@ var ExpandRow = createReactClass({
     };
     return (
       <div>
+        <ButtonToolbar>
+          <ToggleButtonGroup type="radio" name="prime_key_type" onChange={this.onChangePrimeKey} defaultValue={this.state.prime_key}>
+            <ToggleButton value={KEY_TYPE.PJ}    >project</ToggleButton>
+            <ToggleButton value={KEY_TYPE.PERSON}>person</ToggleButton>
+          </ToggleButtonGroup>
+        </ButtonToolbar>
         <ButtonToolbar>
           <ToggleButtonGroup type="radio" name="width_type" onChange={this.onChangeRange} defaultValue={WIDTH_TYPE.WEEK}>
             <ToggleButton value={WIDTH_TYPE.DAY}  >day</ToggleButton>
@@ -141,6 +165,14 @@ var ExpandRow = createReactClass({
 	</BootstrapTable>
       </div>
     );
+  },
+
+  getPrimeKey: function(prime_key) {
+    return (prime_key === KEY_TYPE.PJ) ? "pj" : "person";
+  },
+
+  getSecondKey: function() {
+    return (this.state.prime_key === KEY_TYPE.PJ) ? "person" : "pj";
   },
 
   getRange: function(date_target, width_type, count) {
