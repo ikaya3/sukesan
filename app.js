@@ -66,17 +66,19 @@ var reduce_results = function(key, get_name, results, size_of_range){
 
 var get_condition = function(pjs, persons, field, borders_of_date, collection_detail){
   return new Promise(function(resolve, reject){
+    const condtion_date = { "$and": [ { date: { "$gte": borders_of_date[0] } }, { date: { "$lt": borders_of_date[borders_of_date.length-1] } } ] };
+
     if(pjs){
       resolve({ pj_id: { "$in": pjs } });
     }
 
     if(persons){
-      resolve({ person_id: { "$in": persons } });
+      resolve({ "$and": [ { person_id: { "$in": persons } }, condtion_date ] });
     }
 
     collection_detail.aggregate(
       [
-        { "$match": { "$and": [ { date: { "$gte": borders_of_date[0] } }, { date: { "$lt": borders_of_date[borders_of_date.length-1] } } ] } },
+        { "$match": condtion_date },
         { "$group": { _id: "$" + field  } },
       ],
     ).toArray(function(err, active_records){
