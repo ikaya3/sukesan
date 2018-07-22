@@ -64,64 +64,65 @@ var reduce_results = function(key, get_name, results, size_of_range){
   }, []);
 };
 
+var get_pjs = function(pjs, borders_of_date, collection_detail){
+  return new Promise(function(resolve, reject){
+    if(pjs){
+      resolve(pjs);
+    }
 
-app.get('/api/mongo_test2', function(req, res, next){
-  const borders_of_date = (req.query.borders_of_date || [(new Date()).toJSON()]).map((v) => new Date(v));
-
-  db.collection('detail', function(err, collection){
-    collection.aggregate(
+    collection_detail.aggregate(
       [
         { "$match": { "$and": [ { date: { "$gte": borders_of_date[0] } }, { date: { "$lt": borders_of_date[borders_of_date.length-1] } } ] } },
         { "$group": { _id: "$pj_id"  } },
       ],
     ).toArray(function(err, active_pjs){
+      if(err){
+        reject(err);
+      }
+      resolve(active_pjs.map(function(pj){ return pj._id; }));
+    });
+  });
+};
 
-      active_pjs = active_pjs.map(function(pj){ return pj._id; });
+app.get('/api/mongo_test2', function(req, res, next){
+  const key = req.query.key;
+  const pjs = (typeof(req.query.pjs) === 'string') ? [ req.query.pjs ] : req.query.pjs;
+  const borders_of_date = (req.query.borders_of_date || [(new Date()).toJSON()]).map((v) => new Date(v));
+  console.log(pjs);
+
+  const map_key = (key == "pj")
+    ? function() { emit( { pj_id: this.pj_id, date_index: get_date_index(this.date, borders_of_date) }, { hour: this.hour } ); }
+    : function() { emit( { person_id: this.person_id, person_name: this.person_name, date_index: get_date_index(this.date, borders_of_date) }, { hour: this.hour } ); }
+  ;
+
+  const field_name = {
+   id  : (key == "pj") ? "pj_id" : "person_id",
+   name: (key == "pj")
+      ? (result) => { return pj[result._id["pj_id"]] || "NO NAME"; }
+      : (result) => { return result._id["person_name"]; },
+  };
+
+  db.collection('detail', function(err, collection){
+    get_pjs(pjs, borders_of_date, collection).then(function(active_pjs){
       collection.mapReduce(
-        function() { emit( { pj_id: this.pj_id, date_index: get_date_index(this.date, borders_of_date) }, { hour: this.hour } ); },
-        reduce_hour,
+        map_key, reduce_hour,
         {
           scope: { get_date_index : get_date_index,
                    borders_of_date: borders_of_date,
+                   map_key        : map_key,
                    reduce_hour    : reduce_hour},
           query: { pj_id: { "$in": active_pjs } },
           out  : { inline: 1 },
         },
         function(err, results){
           res.json(reduce_results(
-            "pj_id",
-            (result) => { return pj[result._id["pj_id"]] || "NO NAME"; },
+            field_name.id,
+            field_name.name,
             results,
             borders_of_date.length - 1));
         }
       );
     });
-  });
-});
-
-app.get('/api/mongo_test3', function(req, res, next){
-  const target_pj_id = req.query.pj_id;
-  const borders_of_date = (req.query.borders_of_date || [(new Date()).toJSON()]).map((v) => new Date(v));
-
-  db.collection('detail', function(err, collection){
-    collection.mapReduce(
-      function() { emit( { person_id: this.person_id, person_name: this.person_name, date_index: get_date_index(this.date, borders_of_date) }, { hour: this.hour } ); },
-      reduce_hour,
-      {
-        scope: { get_date_index : get_date_index,
-                 borders_of_date: borders_of_date,
-                 reduce_hour    : reduce_hour},
-        query: { pj_id: target_pj_id },
-        out  : { inline: 1 },
-      },
-      function(err, results){
-        res.json(reduce_results(
-          "person_id",
-          (result) => { return result._id["person_name"]; },
-          results,
-          borders_of_date.length - 1));
-      }
-    );
   });
 });
 

@@ -49,7 +49,10 @@ var ExpandRow = createReactClass({
 
     request
       .get(__AJAX_SERVER_URI + '/api/mongo_test2')
-      .query({borders_of_date: this.getBordersOfDate(range).map((v) => v.toJSON()) })
+      .query({
+        key: "pj",
+        borders_of_date: this.getBordersOfDate(range).map((v) => v.toJSON()),
+      })
       .end(function(err,res){
         const pj_detail = {};
         console.log("response");
@@ -84,8 +87,12 @@ var ExpandRow = createReactClass({
     if(isExpand) {
       console.log(key);
       request
-        .get(__AJAX_SERVER_URI + '/api/mongo_test3')
-        .query({pj_id: key, borders_of_date: this.getBordersOfDate().map((v) => v.toJSON()) })
+        .get(__AJAX_SERVER_URI + '/api/mongo_test2')
+        .query({
+          key: "person",
+          pjs: key,
+          borders_of_date: this.getBordersOfDate().map((v) => v.toJSON()),
+        })
         .end(function(err,res){
           const pj_detail_copy = this.state.pj_detail;
           pj_detail_copy[key] = res.body;
